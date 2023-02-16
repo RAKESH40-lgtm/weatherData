@@ -1,42 +1,48 @@
 import { useState } from "react"
-import myStyle from './home.module.css'
-
+import './home.css'
+import axios from "axios"
 const Home = () => {
-    const [initialCity, setCity] = useState('')
-    const [weatherData, setWeatherData] = useState({})
-    const weatherForc = (e) => {
-        setCity(e.target.value)
-        fetch(`https://api.openweathermap.org/data/2.5/weather?q=${e.target.value}&APPID=0e0e0bed0da5bdeca52cdf68a78bff18`).then((res)=>{
-            res.json()
-        }).then((data) => {
-            setWeatherData(data)
-            if(data){
+    const [city, setCity] = useState('')
+    const [weather, setWeather] = useState({})
+    //to work on this press enter to fetch data
+    const weatherRep = (e) => {
+        if (e.key === "Enter") {
+            axios.get(`https://api.openweathermap.org/data/2.5/weather?q=${city}&APPID=0e0e0bed0da5bdeca52cdf68a78bff18`).then((data) => {
+                let rep = data.data
+                setWeather(rep)
                 setCity('')
-            }
-            console.log(data)
-        }).catch((err) => {
-            console.log(err)
-        })
-    
+                // console.log(data)
+            }).catch((err) => {
+                console.log(err)
+            })
+        }
     }
-    console.log(weatherData)
+    // console.log(weather)
     return (
         <>
-            <div className={myStyle.main_container}>
+            <div className="container">
                 <main>
-                    <div className={myStyle.search_bar}>
-                        <input type="text" placeholder="search the location to check weather"
-                            value={initialCity}
-                            onChange={weatherForc}
+                    <div className="input-field">
+                        <input type="text" placeholder="search" value={city} onChange={(e) => {
+                            setCity(e.target.value)
+                        }}
+                            onKeyDown={weatherRep}
                         />
                     </div>
-                    {/* {weatherData!=="undefined" &&
-                        <div className={myStyle.weatherLoc}>
-                            <div className={myStyle.name}>{weatherData.name} {weatherData.sys.country}</div>
-                            <div className={myStyle.temp}>{weatherData.main.temp}</div>
-                            <div className={myStyle.main}>{weatherData.weather[0].main}</div>
+                    {typeof weather !== "undefined" ? (
+                        <div className="main">
+                            <div className="weathname">
+                                {weather["name"]},
+                                {weather["country"]}
+                            </div>
+                            <div className="temp">
+                                {Math.round(weather.main.temp)}°c
+                            </div>
+                            <div className="det">
+                                {weather.weather[0]}
+                            </div>
                         </div>
-                    } */}
+                    ) : "The city is not defined"}
                 </main>
             </div>
         </>
